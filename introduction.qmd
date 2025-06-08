@@ -1,0 +1,150 @@
+---
+title: "Introduction to R"
+format: html
+---
+---
+title: "Introduction to R"
+format: html
+---
+
+## What is R?
+
+R is a free, open-source programming language and environment specifically designed for statistical computing and data analysis. What makes R truly powerful is its **modular design** - R consists of a core system that provides basic functionality, which is then extended through thousands of specialized packages contributed by statisticians, data scientists, and researchers worldwide.
+
+## The package ecosystem: R's superpower
+
+R's strength lies in its package system. Think of R as a smartphone: the base R installation is like the phone's operating system, providing essential functions. Packages are like apps - each one adds specific capabilities for different tasks.
+
+### Base R vs. packages
+
+**Base R** includes fundamental functions for:
+- Basic arithmetic and statistics
+- Data structures (vectors, data frames, lists)
+- Simple graphics
+- File input/output
+
+**Packages** extend R with specialized tools for:
+- Advanced statistical methods
+- Machine learning algorithms
+- Data visualization
+- Web scraping
+- Bioinformatics
+- Finance and economics
+- PX-files
+- And much more!
+
+### CRAN: The package repository
+
+The Comprehensive R Archive Network (CRAN) hosts over **19,000 packages**. This massive ecosystem means that whatever data analysis task you're facing, someone has likely created a package to help.
+
+```{r}
+#| eval: false
+# Install packages from CRAN
+install.packages("tidyverse")    # Collection of data science packages
+```
+
+## Key package collections
+
+### The tidyverse
+
+The [tidyverse](https://www.tidyverse.org/) is a collection of packages designed for data science with a consistent philosophy and grammar:
+
+```{r}
+#| eval: false
+library(tidyverse)
+
+# This loads 8 core packages:
+# - ggplot2: data visualization
+# - dplyr: data manipulation
+# - tidyr: data tidying
+# - readr: data import
+# - purrr: functional programming
+# - tibble: modern data frames
+# - stringr: string manipulation
+# - forcats: working with factors
+```
+
+R has package ecosystems for virtually every field. So if you need a package in a specific field, browse the web to find it.
+
+
+## Basic R concepts (built on packages)
+
+### Data structures
+
+Even basic data operations benefit from packages:
+
+```{r}
+# Base R data frame
+students_base <- data.frame(
+  name = c("Alice", "Bob", "Charlie"),
+  age = c(20, 22, 19),
+  grade = c(85, 92, 78)
+)
+
+# With tibble (tidyverse package) - enhanced data frames
+library(tibble)
+students_tibble <- tibble(
+  name = c("Alice", "Bob", "Charlie"),
+  age = c(20, 22, 19),
+  grade = c(85, 92, 78)
+)
+
+students_tibble  # Better printing and behavior
+```
+
+### Data manipulation
+
+Base R can manipulate data, but packages can make it easier:
+
+```{r}
+#| eval: false
+# Base R
+high_grades <- students_base[students_base$grade > 80, ]
+mean_age <- mean(students_base$age)
+
+# With dplyr (tidyverse package) 
+library(dplyr)
+high_grades <- students_tibble %>% 
+  filter(grade > 80)
+
+mean_age <- students_tibble %>% 
+  summarise(avg_age = mean(age))
+```
+
+## Package management
+
+### Installing and loading packages
+
+```{r}
+#| eval: false
+# Install once per computer
+install.packages("package_name")
+
+# Load each R session
+library(package_name)
+
+# Alternative loading method
+require(package_name)
+
+# Install multiple packages at once
+install.packages(c("dplyr", "ggplot2", "readr"))
+```
+
+
+## Why the package approach works
+
+1. **Specialization**: Experts in each field contribute domain-specific tools
+2. **Quality control**: CRAN has submission standards ensuring package quality
+3. **Community-driven**: Thousands of contributors improve and maintain packages
+4. **Modularity**: Only load what you need, keeping R fast and efficient
+5. **Innovation**: New methods are quickly available as packages
+
+## Getting started workflow
+
+1. **Install base R** and RStudio
+2. **Identify your needs** (data visualization, statistical modeling, etc.)
+3. **Find relevant packages** using CRAN Task Views or online resources
+4. **Install and explore** packages with documentation and examples
+5. **Combine packages** to build powerful analysis workflows
+
+R's package-centric design means you're never starting from scratch - you're building on the work of thousands of experts who've solved similar problems. This collaborative approach makes R incredibly powerful for data analysis across virtually any domain!

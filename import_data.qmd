@@ -1,0 +1,182 @@
+---
+title: "Importing data"
+format: html
+---
+
+## Packages for data import
+  
+There is a wide range of R-packages for importing all different data formats to R. R also has its own data format called ".rds". Datasets can be written and read respectively via the R functions `saveRDS()` and `readRDS()`. However, you will rarely find data saved in rds-format on a webpage where you can download it. R has a package for importing almost any data format and if in doubt, ask your favourite chatbot for help. The sections below go through the most common data formats.
+
+### Delimited files (`readr`)
+
+The package [readr](https://readr.tidyverse.org/), which is also part of the [tidyverse](https://www.tidyverse.org/), has a lot of functions to deal with csv-files and other delimited files. The following code shows examples on the most commonly used functions from the `readr` package, note the difference between `read_csv()` (comma-delimiter) and `read_csv2()` (semicolon delimiter).
+
+```{r}
+#| eval: false
+#| label: delimters
+library(readr)
+
+# Read CSV files, comma separation
+data <- read_csv("file.csv")
+
+# Read files with semicolon separation (common in European data)
+data <- read_csv2("file.csv")
+
+# Read tab-separated files
+data <- read_tsv("file.tsv")
+
+# Read files with custom delimiters, here a pipe: "|"
+data <- read_delim("file.txt", delim = "|")
+
+```
+
+The `readr` functions automatically detect column types and handle common issues like missing values. You can specify column types explicitly using the `col_types` argument:
+  
+```{r}
+#| eval: false
+#| label: ext_csv
+data <- read_csv("file.csv", 
+                 col_types = cols(
+                   id = col_integer(),
+                   name = col_character(),
+                   date = col_date(),
+                   value = col_double()
+                 ))
+```
+
+### Excel files (`readxl`)
+
+For Excel files (.xlsx and .xls), the [readxl](https://readxl.tidyverse.org/) package can be used and is also part of the tidyverse ecosystem. There is a few alternatives as well, the [`xlsx` package](https://colearendt.github.io/xlsx/index.html) and the [`openxlsx` package](https://ycphs.github.io/openxlsx/index.html#openxlsx-). If you have to write data to Excel, it might be relevant to look at especially `openxlsx`, but for reading Excel files, `readxl` should do the trick.
+
+```{r}
+#| eval: false
+#| label: excel
+library(readxl)
+
+# Read the first sheet
+data <- read_excel("file.xlsx")
+
+# Read a specific sheet by name or number
+data <- read_excel("file.xlsx", sheet = "Sheet2")
+data <- read_excel("file.xlsx", sheet = 2)
+
+# Read a specific range
+data <- read_excel("file.xlsx", range = "A1:D10")
+
+# Skip rows (useful for files with headers or metadata)
+data <- read_excel("file.xlsx", skip = 3)
+```
+
+You can also list all sheet names in an Excel file:
+
+```{r}
+#| eval: false
+#| label: sheets
+excel_sheets("file.xlsx")
+```
+
+### Statistical software formats (`haven`)
+
+The [haven](https://haven.tidyverse.org/) package imports data from SPSS, Stata, and SAS.
+
+```{r}
+#| eval: false
+#| label: haven
+library(haven)
+
+# Stata files
+data <- read_dta("file.dta")
+
+# SAS files
+data <- read_sas("file.sas7bdat")
+
+# SPSS files
+data <- read_sav("file.sav")
+
+```
+
+These functions preserve variable labels and value labels from the original statistical software. This can also make the datasets time consuming to import. The `n_max` argument can be used to only import part of dataset. Afterwards the `col_select` argument can be used to read only the necessary columns. The following code shows an example of this workflow.
+
+```{r}
+#| eval: false
+#| label: obs1
+
+# Reading only first observation to inspect columns of the data
+data_obs1 <- read_dta("file.dta", n_max = 1)
+
+# Reading the necessary columns
+data <- read_dta("file.dta", col_select = c("id", "age", "sex", "education", "income", "district"))
+
+```
+
+### JSON files (`jsonlite`)
+
+JSON (JavaScript Object Notation) is increasingly common for data exchange, especially from APIs. The [jsonlite](https://arxiv.org/abs/1403.2805) package handles JSON data efficiently.
+
+```{r}
+#| eval: false
+#| label: json
+library(jsonlite)
+
+# Read JSON from file
+data <- fromJSON("file.json")
+
+# Read JSON from URL
+data <- fromJSON("https://api.example.com/data.json")
+
+# Convert R object to JSON
+json_string <- toJSON(data, pretty = TRUE)
+```
+
+
+### Large files (`data.table` and `vroom`)
+
+For very large files, specialized packages offer better performance, especially the `data.table` and `vroom` package.
+  
+```{r}
+#| eval: false
+#| label: datatable
+library(data.table)
+library(vroom)
+
+# data.table's fast reader
+data <- fread("large_file.csv")
+
+# vroom for very fast reading
+data <- vroom("large_file.csv")
+```
+
+## Reproducible paths and R-projects
+
+One of the most common issues when sharing R code or moving projects between computers is broken file paths. Using R Projects and the here package creates reproducible workflows that work across different operating systems and directory structures. For this reason it is recommended to have an R-project when working on your code.
+
+### R Projects
+
+R Projects (.Rproj files) create a self-contained workspace for your analysis. Simply when opening an R Project, RStudio automatically sets the working directory to the project folder. This means you can use relative paths that work regardless of where the project is stored on your computer. Furthermore you can export your folder structure and send it to another person, who will be able to run the same code through the R Project.
+
+To create an R Project:
+
+  1. File → New Project → New Directory → New Project
+  2. Give your project a name and choose a location
+  3. RStudio will create a .Rproj file and set up the folder structure
+
+### The `here` package
+
+The here package builds file paths relative to your project root, and therefore makes sense to use within your project. This also makes your code more portable and robust.
+
+
+```{r}
+#| eval: false
+#| label: here
+library(here)
+
+# Instead of this (brittle, won't work on other computers):
+data <- read_csv("C:/Users/YourName/Documents/my_project/data/file.csv")
+
+# Use this (portable, works anywhere):
+data <- read_csv(here("data", "file.csv"))
+
+# The here() function builds the complete path
+here("data", "file.csv")
+# Returns: "/path/to/your/project/data/file.csv"
+```
