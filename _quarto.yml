@@ -1,0 +1,19 @@
+project:
+  type: book
+  output-dir: _book
+
+
+
+book:
+  title: "mybook"
+  chapters: 
+    - index.qmd
+    - introduction.qmd
+    - import_data.qmd
+    - pxfiles_in_R.qmd
+    - px_from_scratch.qmd
+    - update_px_files.qmd
+  
+format:
+  html:
+    theme: cosmo

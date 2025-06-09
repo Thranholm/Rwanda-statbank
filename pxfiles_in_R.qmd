@@ -1,0 +1,93 @@
+---
+title: "PX files in R"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+# PX-Files and the PX-File Format
+
+## What is the PX-file format?
+
+The PX-file format is a specialized data format developed specifically for storing and distributing multidimensional statistical data. Originally created by [Statistics Sweden (SCB)](https://www.scb.se/en/) in the 1990s, the PX format has become the standard format for official statistics across most Nordic countries and is increasingly used by statistical organizations worldwide.
+
+The name "PX" comes from the original Swedish developed software program "PC-AXIS" to display and work with large tabular data. The format was designed to address the unique needs of statistical data distribution, where both data values and comprehensive metadata must be preserved and transmitted together.
+
+## Use of PX-files for dissemination of official statistics
+
+The real power and motivation for PX-files stems from the possibility of disseminating the files through [PX-web](https://www.scb.se/en/services/statistical-programs-for-px-files/px-web/). PX-web can be used to publish statistics in a web based database. Since 1 January 2016 it has been free for government agencies and municipalities, international NSIs and international organisations of statistics to use free of charge.
+
+When putting the PX-files in PX-web, it is possible to create a Statbank or Statistical Database with any imaginable official statistics, e.g. population, labour market, business or financial statistics. Making the statistics available for the public and policy makers, so people can be informed and ultimately support better and more efficient policy making.
+
+The PX-file and PX-web to create a Statbank are used by different national statistical institutes, e.g. Sweden, Norway, Finland, Iceland, Faroe Islands, Greenland, Latvia, Moldova, Ghana and more. So the use has spread from the Nordic to many other countries. There is any R package [`pxweb`](https://ropengov.github.io/pxweb/index.html) that provides handy functions to work with the PX-web API. It also has a hardcoded list of 30 countries and agencies that use PX-web for diseminating statistics, but their list is not exhaustive.
+
+## PX-files in R
+
+R can be used to create and work with PX-files. Statistics Greenland has developed a great package for working with PX-files in R, called `pxmake`. In it simplest form it can take an existing data frame in R and turn it into an exported PX-file. More information can be found on the [pxmake webpage](https://statisticsgreenland.github.io/pxmake/). In the following documents, `pxmake`'s functions will be used to show how to update existing file, create new files and change multiple files at once.
+
+The following code showcases a basic example for generating a PX-file:
+
+```{r}
+#| eval: false
+# Install pxmmake if not already installed
+install.packages("pxmake")
+
+# Load pxmake
+library(pxmake)
+
+# Dataframe we want to convert to PX-file
+df <- expand.grid(age = 20:40,
+                 sex = c("M", "F"),
+                 urban = c("Urban", "Rural"))
+
+# add counts 
+df$value <- sample(100:1000, nrow(df), replace = TRUE)
+
+# Creating px object in R 
+px_df <- px(df)
+
+# Saving the px file in current working directory
+px_save(px_df, path = "test_px_file.px")
+```
+
+This is not a good PX-file yet! We need to add more metadata for it to be a proper PX-file.
+
+## Key characteristics of PX files
+
+### Self-documenting structure
+PX files are self-documenting, meaning they contain both the statistical data and all necessary metadata within a single file. This includes variable descriptions, data sources, contact information, creation dates, and methodological notes. This comprehensive approach ensures that users receive not just numbers, but the context needed to understand and properly use the data.
+
+## File structure and components
+
+### Metadata section
+The metadata section appears at the beginning of the file and contains descriptive information about the dataset. This includes:
+
+- **Dataset identification**: Title, description, and unique identifiers
+- **Variable definitions**: Names, labels, and valid values for each dimension
+- **Time information**: Time periods covered and temporal formatting
+- **Geographic coding**: Geographic classifications and hierarchies
+- **Data source**: Origin, collection method, and responsible organization
+- **Technical details**: Creation date, language, character encoding
+- **Contact information**: Who to contact for questions or additional information
+
+### Data section
+The data section contains the actual statistical values, organized according to the dimensional structure defined in the metadata. The data is typically arranged in a specific order that corresponds to the variable hierarchy specified in the metadata section.
+
+The documentation for the PX-file format can be found from Statistics Sweden [here](https://www.scb.se/en/services/statistical-programs-for-px-files/px-file-format/).
+
+### Metadata in `pxmake`
+
+The `pxmake` package has functions to add metadata to our PX-file named after which keyword or metadata we want to create or edit. So if we want to add a title to our PX-file, we can do it with the function `px_title`.
+
+
+```{r}
+#| eval: false
+
+px_df <- px_title(px_df, "Test PX-file")
+
+```
+
+With the power of the `magrittr` pipe we can add many more metadata functions together. The following guides will exemplify this. A list of all supported keywords (and not supported keywords) can be found [here](https://statisticsgreenland.github.io/pxmake/).
+
+Read the introduction from the `pxmake` package on who to create your [first PX-file](https://statisticsgreenland.github.io/pxmake/articles/first-px-file.html), which has a more extented example of making a proper PX-file.
+

@@ -1,0 +1,106 @@
+---
+title: "PX-file from scratch"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+## Small PX-file from scratch
+
+This guide walks through how take microdata and create a PX-file. There might be some considerations in this process depending on the types of variables you have in your data. Microdata is understood in the way that each row is an observation, so for population statistics each row will be a person.
+
+### Inspecting data
+
+We use the test data `greenlanders` from the `pxmake` package, which is a small dataset about the Greenlandic population containing the variables: cohort, gender, age and municipality.
+
+```{r}
+library(pxmake)
+
+str(greenlanders)
+head(greenlanders)
+```
+
+### Modifying and saving the file
+
+We also want to use some data manipulation functions so we read in the `tidyverse`, where especially the pipe operator also comes in handy.
+
+First we calculate a frequency variable for the data
+
+```{r}
+library(tidyverse)
+
+gl_freq <- greenlanders %>% 
+  count(across(everything()), name = "freq", .drop = FALSE)
+
+head(gl_freq)
+
+```
+
+Now we can start making our PX-file, adding a title, contact information and more
+
+```{r}
+
+gl_freq %>% 
+  # converting to px
+  px() %>% 
+  # adding title
+  px_title("Test file with Greenland sample population") %>% 
+  # adding a matrix-name
+  px_matrix("POP1") %>% 
+  # information about units
+  px_units("Persons") %>% 
+  # Subject area
+  px_subject_area("Population") %>% 
+  # Subject code
+  px_subject_code("POP") %>% 
+  # data source
+  px_source("Statistics Greenland") %>% 
+  # contact 
+  px_contact("Emil Thranholm") %>% 
+  # add a total level for variables
+  px_add_totals(c("cohort", "gender", "age", "municipality")) %>% 
+  # variable labels, changing names to be displayed in px-web
+  px_variable_label(tribble(~`variable-code`, ~`variable-label`,
+                            "cohort", "Cohort",
+                            "gender", "Gender",
+                            "age", "Age",
+                            "municipality", "Location")) %>% 
+  # saving px-file
+  px_save("px_greenland_testfile.px")
+
+
+```
+
+## Hierarchies in PX-files
+
+Now we can make a simple PX-file from microdata. However, sometimes we might have a variable with a hierarchical structure. In this case the variable age will be the example, as it can be grouped in multiple ways, e.g. 5 years group and 10 years group or other groups.
+
+### Selection list
+
+Currently the age variable is in one year groups. 
+
+### Tree like hierarchy
+
+
+```{r}
+#| eval: false
+
+vs_file <- system.file("extdata", "Age5.vs", package = "pxmake")
+
+agg_files <- c(
+  system.file("extdata", "10-years_classes.agg", package = "pxmake"),
+  system.file("extdata", "25-years_classes.agg", package = "pxmake")
+)
+
+t <- map(agg_files, read_table)
+
+install.packages("SSBtools")
+
+SSBtools::Formula2ModelMatrix()
+SSBtools::map_hierarchies_to_data()
+
+```
+
+
+
+
