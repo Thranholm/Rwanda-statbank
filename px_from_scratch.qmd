@@ -83,9 +83,19 @@ Currently the age variable is in one year groups. It could make sense to group t
 # If not installed
 # install.packages("AMR")
 
-gl_freq %>% 
+age_classification <- gl_freq %>% 
   mutate(age5 = AMR::age_groups(age, split_at = "fives"),
-         age10 = AMR::age_groups(age, split_at = "tens"))
+         age10 = AMR::age_groups(age, split_at = "tens")) %>% 
+  distinct(age, age5, age10) %>% 
+  arrange(age5) %>% 
+  select(valuecode = age, valuetext = age,
+         `5 years classes` = age5,
+         `10 years classes` = age10)
+
+age_class <- px_classification(name = "age5", prestext = "5 yearsTEST",
+                               domain = "age", df = age_classification)
+
+px_save_classification(age_class, getwd())
 
 ```
 
@@ -104,6 +114,8 @@ agg_files <- c(
 )
 
 t <- map(agg_files, read_table)
+
+?px_classification
 
 install.packages("SSBtools")
 
