@@ -77,7 +77,18 @@ Now we can make a simple PX-file from microdata. However, sometimes we might hav
 
 ### Selection list
 
-Currently the age variable is in one year groups. 
+Currently the age variable is in one year groups. It could make sense to group that into 5 year and 10 year groups. Therefore, we make 5 and 10 year groups in our data using the `age_groups()` function from the `AMR` package.
+
+```{r}
+# If not installed
+# install.packages("AMR")
+
+gl_freq %>% 
+  mutate(age5 = AMR::age_groups(age, split_at = "fives"),
+         age10 = AMR::age_groups(age, split_at = "tens"))
+
+```
+
 
 ### Tree like hierarchy
 
