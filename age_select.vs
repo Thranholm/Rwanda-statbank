@@ -1,6 +1,6 @@
 [Descr]
-Name=age5
-Prestext=5 yearsTEST
+Name=age_select
+Prestext=Age classification
 Type=V
  
 [Aggreg]
@@ -8,7 +8,7 @@ Type=V
 2=10 years classes.agg
  
 [Domain]
-1=age
+1=age_class
  
 [Valuecode]
 1=18
