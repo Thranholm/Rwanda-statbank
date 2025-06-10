@@ -114,13 +114,13 @@ mean_age <- students_tibble %>%
 ```{r}
 #| eval: false
 # Install once per computer
-install.packages("package_name")
+install.packages("dplyr")
 
 # Load each R session
-library(package_name)
+library(dplyr)
 
 # Alternative loading method
-require(package_name)
+require(dplyr)
 
 # Install multiple packages at once
 install.packages(c("dplyr", "ggplot2", "readr"))
