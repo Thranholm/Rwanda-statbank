@@ -1,0 +1,7 @@
+---
+title: "Validating PX-files via API"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
