@@ -27,6 +27,7 @@ We also want to use some data manipulation functions so we read in the `tidyvers
 First we calculate a frequency variable for the data
 
 ```{r}
+#| message: false
 library(tidyverse)
 
 gl_freq <- greenlanders %>% 
@@ -75,7 +76,7 @@ gl_freq %>%
 
 Now we can make a simple PX-file from microdata. However, sometimes we might have a variable with a hierarchical structure. In this case the variable age will be the example, as it can be grouped in multiple ways, e.g. 5 years group and 10 years group or other groups.
 
-### Selection list
+### Selection lists
 
 Currently the age variable is in one year groups. It could make sense to group that into 5 year and 10 year groups. Therefore, we make 5 and 10 year groups in our data using the `age_groups()` function from the `AMR` package.
 
@@ -92,37 +93,42 @@ age_classification <- gl_freq %>%
          `5 years classes` = age5,
          `10 years classes` = age10)
 
-age_class <- px_classification(name = "age5", prestext = "5 yearsTEST",
-                               domain = "age", df = age_classification)
-
-px_save_classification(age_class, getwd())
+head(age_classification)
 
 ```
 
+The above code creates a data frame, which can be used as input to the function `px_classification()`. It must have the mandatory column `valuecode` indicating the codes in the data for the given variable. The column `valuetext` is also included here, but is only required if there are texts associated with the codes in the PX-file, e.g. if using data for economic activity ([ISIC](https://unstats.un.org/unsd/classifications/Econ/isic) or similar) then the codes may have texts. Any additional column represents an aggregation and the column name, will be the aggregation name shown in PX-web. In this case we have two aggregations `5 years classes` and `10 years classes`. As the column names are the text shown on PW-web the names have been enclosed in backticks (`) to allow for spacing in the name.
+
+Now we use `px_classification` to create the selection lists in R and afterwards we use `px_save_classification()` to export the relevant files. It creates a ".vs" file and one or more ".agg" files. In very simple terms the ".vs" file tells PX-web which selection/aggregation lists to use, while the ".agg" files are the actual aggregations, e.g. five year classes and ten year classes in this case. More information can be found in the documentation for the [PX-file format](https://www.scb.se/en/services/statistical-programs-for-px-files/px-file-format/).
+
+```{r}
+
+
+age_class <- px_classification(name = "age_select", prestext = "Age classification",
+                               domain = "age_class", df = age_classification)
+
+px_save_classification(age_class, getwd())
+```
+
+The `name` argument will be the name of the ".vs" file, in this case it saves the file as "age_select.vs". `df` is the data frame with the classification/selection list just created. The `domain` is the name that we need to put in our PX-file to indicate that the PX-file should use the particular selection list. So the code below read the PX-file to R and set the domain for `age` as `age_class` (so for the variable `age`should the selection lists with the domain `age_class` be used).
+
+```{r}
+
+px("px_greenland_testfile.px") %>% 
+  px_domain(tribble(~`variable-code`, ~domain,
+                    "age", "age_class")) %>% 
+  px_save("px_greenland_testfile.px")
+
+
+```
+
+Afterwards the modified PX-file is saved again and is now ready to be loaded to PX-web and saved in the same folder as the ".vs" and ".agg" files.
 
 ### Tree like hierarchy
 
+Instead of selection lists, it is also possible to have a hierarchy in a tree-like structure. However, this feature is not yet supported in `pxmake`, hence it is recommended to use the selection lists presented above for now.
 
-```{r}
-#| eval: false
-
-vs_file <- system.file("extdata", "Age5.vs", package = "pxmake")
-
-agg_files <- c(
-  system.file("extdata", "10-years_classes.agg", package = "pxmake"),
-  system.file("extdata", "25-years_classes.agg", package = "pxmake")
-)
-
-t <- map(agg_files, read_table)
-
-?px_classification
-
-install.packages("SSBtools")
-
-SSBtools::Formula2ModelMatrix()
-SSBtools::map_hierarchies_to_data()
-
-```
+If it is still wished to use the tree like hierarchy, it is a bit more complicated, but can be done through the `HIERARCHIES` keyword in the [PX-file format](https://www.scb.se/en/services/statistical-programs-for-px-files/px-file-format/).
 
 
 
