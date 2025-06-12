@@ -4,3 +4,14 @@ format: html
 ---
 
 
+
+```{r}
+library(haven)
+library(tidyverse)
+
+read_dta("data/RW_LFS2024.dta") %>% 
+  sjlabelled::get_labels(values = "p")
+
+```
+
+
