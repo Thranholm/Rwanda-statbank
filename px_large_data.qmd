@@ -1,0 +1,19 @@
+---
+title: "Large PX-files and data"
+editor_options: 
+  chunk_output_type: console
+---
+
+## Size matters
+
+PX-files can contain a lot of data, which is great. However this also means that some way along the process it had required handling of this large data. The chapter [Importing data](import_data.qmd) gives some tips about handling large datasets via functions in the `haven` package with `n_max` and `col_select`. The same arguments are also available for csv-files e.g. in the function `readr::read_csv()`.
+
+
+
+```{r}
+
+haven::read_dta()
+px_save()
+
+```
+
