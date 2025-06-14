@@ -6,7 +6,7 @@ execute:
   freeze: auto
 
 book:
-  title: "mybook"
+  title: "PX-files and R"
   chapters: 
     - index.qmd
     - introduction.qmd
@@ -18,7 +18,9 @@ book:
     - px_files_code.qmd
     - px_multi_lingual.qmd
     - px_validate_api.qmd
+    - px_large_data.qmd
   
 format:
   html:
     theme: cosmo
+    embed-resources: true
