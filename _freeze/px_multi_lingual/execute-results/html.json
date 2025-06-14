@@ -1,0 +1,15 @@
+{
+  "hash": "aec7dcc0b9b3a09fcd1f49ece79cab9d",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Multiple languages in PX-files\"\nformat: html\neditor_options: \n  chunk_output_type: console\n---\n\n\n\n\n\n## Adding another language to your PX-files\n\nMultiple countries have more official languages and even though the country does not have multiple languages, it may still be valuable to add another language to the PX-web tables to increase availability.\n\nFor example Finland has three languages in their [Statistical Database](https://pxdata.stat.fi/PxWeb/pxweb/en/StatFin/), the country's two official languages Finish and Swedish, and then English to increase availability for non Finish or Swedish speakers. Likewise Greenland also in their [Statbank](https://bank.stat.gl/pxweb/en/Greenland/) has three languages, Greenlandic, Danish and English. Both uses PX-files and PX-web to publish their tables.\n\nA main argument of developing `pxmake` from [Statistics Greenland](https://statisticsgreenland.github.io/pxmake/) was to have a good tool to handling more languages in PX-file and as we will see below it achieves just that.\n\n### The `px_languages()` function\n\nWhen making a PX-file using `pxmake` the language keyword does not have a default. So for instance, the tables we made with data from the Rwandan Labour Force Survey in the chapter [Updating PX-files](px_update_files.qmd) does not have a language set. This can easily be set to English using the function `px_language()`.\n\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(tidyverse)\nlibrary(pxmake)\n\n# Importing our px-file about labour force\npx(\"lfs_tab1.px\") %>% \n  # set language to English\n  px_language(\"en\")\n\n\npx(\"lfs_tab1.px\") %>% \n  px_language(c(\"en\", \"fr\"))\n\n\npx_language()\n```\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
