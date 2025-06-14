@@ -23,4 +23,3 @@ book:
 format:
   html:
     theme: cosmo
-    embed-resources: true
