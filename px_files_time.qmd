@@ -16,8 +16,8 @@ It follows the following formats:
 - Annual: 2024, 2025
 - Half-yearly: 2025H1, 2025H2
 - Quarterly: 2025Q1, 2025Q2, 2025Q3, 2025Q4
-- Monthly: 2025M01, 2025M02, 2025M03, 2025M04
-- Weekly: 2025W01, 2025W02, 2025W03, 2025W04
+- Monthly: 2025M01, 2025M02, 2025M03, 2025M04...
+- Weekly: 2025W01, 2025W02, 2025W03, 2025W04...
 
 Below we import an example PX-file with employment data. It has the variables `Time` and `Quarter` and we want to join them together to make it easier for our users for PX-web when using the plot feature.
 
