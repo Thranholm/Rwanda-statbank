@@ -1,8 +1,4 @@
 - source: project
   quarto-pub:
-    - id: 525cd672-f486-4217-966b-9d29a923026d
-      url: https://thranholm.quarto.pub/px-files-and-r
-    - id: 42d43287-2e1e-458a-b80d-3a8d275ebda9
-      url: https://thranholm.quarto.pub/draft-px-files-and-r
     - id: 81712538-82f2-4c1d-9c2e-ebc1c47cfb90
       url: https://thranholm.quarto.pub/rwanda-px-files-and-r
