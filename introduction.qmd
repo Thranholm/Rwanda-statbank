@@ -90,7 +90,7 @@ students_tibble  # Better printing and behavior
 
 ### Data manipulation
 
-Base R can manipulate data, but packages can make it easier:
+Base R can manipulate data, but packages make it easier:
 
 ```{r}
 #| eval: false

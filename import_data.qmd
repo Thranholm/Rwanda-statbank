@@ -5,11 +5,11 @@ format: html
 
 ## Packages for data import
   
-There is a wide range of R-packages for importing all different data formats to R. R also has its own data format called ".rds". Datasets can be written and read respectively via the R functions `saveRDS()` and `readRDS()`. However, you will rarely find data saved in rds-format on a webpage where you can download it. R has a package for importing almost any data format and if in doubt, ask your favourite chatbot for help. The sections below go through the most common data formats.
+There is a wide range of R packages for importing all different data formats to R. R also has its own data format called ".rds". Datasets can be written and read respectively via the R functions `saveRDS()` and `readRDS()`. However, you will rarely find data saved in rds format on a webpage where you can download it. R has a package for importing almost any data format, and if in doubt, ask your favorite chatbot for help. The sections below go through the most common data formats.
 
 ### Delimited files (`readr`)
 
-The package [readr](https://readr.tidyverse.org/), which is also part of the [tidyverse](https://www.tidyverse.org/), has a lot of functions to deal with csv-files and other delimited files. The following code shows examples on the most commonly used functions from the `readr` package, note the difference between `read_csv()` (comma-delimiter) and `read_csv2()` (semicolon delimiter).
+The package [readr](https://readr.tidyverse.org/), which is also part of the [tidyverse](https://www.tidyverse.org/), has a lot of functions to deal with CSV files and other delimited files. The following code shows examples of the most commonly used functions from the `readr` package. Note the difference between `read_csv()` (comma delimiter) and `read_csv2()` (semicolon delimiter).
 
 ```{r}
 #| eval: false
@@ -46,7 +46,7 @@ data <- read_csv("file.csv",
 
 ### Excel files (`readxl`)
 
-For Excel files (.xlsx and .xls), the [readxl](https://readxl.tidyverse.org/) package can be used and is also part of the tidyverse ecosystem. There is a few alternatives as well, the [`xlsx` package](https://colearendt.github.io/xlsx/index.html) and the [`openxlsx` package](https://ycphs.github.io/openxlsx/index.html#openxlsx-). If you have to write data to Excel, it might be relevant to look at especially `openxlsx`, but for reading Excel files, `readxl` should do the trick.
+For Excel files (.xlsx and .xls), the [readxl](https://readxl.tidyverse.org/) package can be used and is also part of the tidyverse ecosystem. There are a few alternatives as well: the [`xlsx` package](https://colearendt.github.io/xlsx/index.html) and the [`openxlsx` package](https://ycphs.github.io/openxlsx/index.html#openxlsx-). If you have to write data to Excel or load formatted sheets, it might be relevant to look at especially `openxlsx`, but for reading simple Excel files, `readxl` should do the trick.
 
 ```{r}
 #| eval: false
@@ -95,7 +95,7 @@ data <- read_sav("file.sav")
 
 ```
 
-These functions preserve variable labels and value labels from the original statistical software. This can also make the datasets time consuming to import. The `n_max` argument can be used to only import part of dataset. Afterwards the `col_select` argument can be used to read only the necessary columns. The following code shows an example of this workflow.
+These functions preserve variable labels and value labels from the original statistical software. This can also make the datasets time-consuming to import. The `n_max` argument can be used to only import part of a dataset. Afterwards, the `col_select` argument can be used to read only the necessary columns. The following code shows an example of this workflow.
 
 ```{r}
 #| eval: false
@@ -131,7 +131,7 @@ json_string <- toJSON(data, pretty = TRUE)
 
 ### Large files (`data.table` and `vroom`)
 
-For very large files, specialized packages offer better performance, especially the `data.table` and `vroom` package.
+For very large files, specialized packages offer better performance, especially the `data.table` and `vroom` packages.
   
 ```{r}
 #| eval: false
@@ -146,13 +146,13 @@ data <- fread("large_file.csv")
 data <- vroom("large_file.csv")
 ```
 
-## Reproducible paths and R-projects
+## Reproducible paths and R projects
 
-One of the most common issues when sharing R code or moving projects between computers is broken file paths. Using R Projects and the here package creates reproducible workflows that work across different operating systems and directory structures. For this reason it is recommended to have an R-project when working on your code.
+One of the most common issues when sharing R code or moving projects between computers is broken file paths. Using R Projects and the here package creates reproducible workflows that work across different operating systems and directory structures. For this reason, it is recommended to have an R project when working on your code.
 
 ### R Projects
 
-R Projects (.Rproj files) create a self-contained workspace for your analysis. Simply when opening an R Project, RStudio automatically sets the working directory to the project folder. This means you can use relative paths that work regardless of where the project is stored on your computer. Furthermore you can export your folder structure and send it to another person, who will be able to run the same code through the R Project.
+R Projects (.Rproj files) create a self-contained workspace for your analysis. When opening an R Project, RStudio automatically sets the working directory to the project folder. This means you can use relative paths that work regardless of where the project is stored on your computer. Furthermore, you can export your folder structure and send it to another person, who will be able to run the same code through the R Project.
 
 To create an R Project:
 

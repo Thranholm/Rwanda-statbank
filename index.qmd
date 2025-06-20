@@ -3,16 +3,13 @@ title: "Welcome"
 format: html
 ---
 
-Theses documents contains files for a mission from Statistics Denmark to 
-National Institute of Statistics of Rwanda on improving processes in 
-the pxweb statbank using R.
+This book contain chapters for a mission from Statistics Denmark to 
+The National Institute of Statistics of Rwanda on improving processes in 
+the PXweb StatBank using R.
 
-It contains different guides on how to use R to set up a workflow
-for creating PX-files (the input for a PXweb statbank). It also contain
+The book contains different guides on how to use R to set up a workflow
+for creating PX-files (the input for a PX-web StatBank). It also contains
 more general files about reading data to R and different topics,
-but all with the aim to later create PX-files.
+but all with the aim to create PX-files later.
 
-Please note that this book is a draft currently and still lacks some editing. There is ongoing work on the book and its content may change.
-
-
-
+Please note that this book is currently a draft and still lacks some editing. There is ongoing work on the book, and its content may change.
