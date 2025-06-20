@@ -7,36 +7,150 @@ editor_options:
 
 ## Adding another language to your PX-files
 
-Multiple countries have more official languages and even though the country does not have multiple languages, it may still be valuable to add another language to the PX-web tables to increase availability.
+Multiple countries have more than one official language, and even though a country does not have multiple languages, it may still be valuable to add another language to the PX-web tables to increase accessibility.
 
-For example Finland has three languages in their [Statistical Database](https://pxdata.stat.fi/PxWeb/pxweb/en/StatFin/), the country's two official languages Finish and Swedish, and then English to increase availability for non Finish or Swedish speakers. Likewise Greenland also in their [Statbank](https://bank.stat.gl/pxweb/en/Greenland/) has three languages, Greenlandic, Danish and English. Both uses PX-files and PX-web to publish their tables.
+For example, Finland has three languages in their [Statistical Database](https://pxdata.stat.fi/PxWeb/pxweb/en/StatFin/): the country's two official languages, Finnish and Swedish, and then English to increase accessibility for a broader audience. Likewise, Greenland also has three languages in their [Statbank](https://bank.stat.gl/pxweb/en/Greenland/): Greenlandic, Danish, and English. Both use PX-files and PX-web to publish their tables.
 
-A main argument of developing `pxmake` from [Statistics Greenland](https://statisticsgreenland.github.io/pxmake/) was to have a good tool to handling more languages in PX-file and as we will see below it achieves just that.
+A main argument for developing `pxmake` from [Statistics Greenland](https://statisticsgreenland.github.io/pxmake/) was to have a good tool for handling multiple languages in PX-files, and as we will see below, it achieves just that.
 
 ### The `px_languages()` function
 
-When making a PX-file using `pxmake` the language keyword does not have a default. So for instance, the tables we made with data from the Rwandan Labour Force Survey in the chapter [Updating PX-files](px_update_files.qmd) does not have a language set. This can easily be set to English using the function `px_language()`.
+When making a PX-file using `pxmake`, the language keyword does not have a default. For instance, the tables we made with data from the Rwandan Labour Force Survey in the chapter [Updating PX-files](px_update_files.qmd) do not have a language set. This can easily be set to English using the function `px_language()`, which sets the main language of the PX-file.
 
 ```{r}
 #| message: false
-#| eval: false
+#| results: hold
 library(tidyverse)
 library(pxmake)
 
 # Importing our px-file about labour force
-px("lfs_tab1.px") %>% 
+px_en <- px("lfs_tab1.px") %>% 
   # set language to English
   px_language("en")
 
-
-px("lfs_tab1.px") %>% 
-  px_language(c("en", "fr"))
-
-
-px_language()
+# Check the language
+px_en %>% 
+  px_language()
 
 ```
 
+Now we have set the language to "en" for English using the `px_language()` function. Note that there are two language functions in `pxmake`: `px_language()`, which we just showcased, and `px_languages()` for setting multiple languages.
+
+Let's add another language to our PX-file, so it is in both English and French. Here we use the `px_languages()` function, and we still need to set English as the main language via `px_language()`[^1].
+
+[^1]: This may be changed in a future version so `px_languages(c("en", "fr")` just can be used with the first as the main language.
+
+```{r}
+
+px("lfs_tab1.px") %>% 
+  px_language("en") %>% 
+  px_languages(c("en", "fr")) %>% 
+  # print title to see what happened
+  px_title()
+
+```
+
+The code above added English and French as languages and printed the title. Now we have two titles, and in the language column we can see "en" and "fr". However, as we can see, both titles are (for now) in English. So the `px_languages()` function has just duplicated the current titles, value labels, etc., and then `pxmake` leaves it to the language experts to translate.
+
+### Translating in R
+
+We can use the functions in `pxmake` to translate our PX-file directly in R. However, this process can be quite code-heavy and requires that the translators know how to code in R. As we will see below, using Excel in the translation process may in many situations be a better solution.
+
+```{r}
+
+px("lfs_tab1.px") %>% 
+  px_language("en") %>% 
+  px_languages(c("en", "fr")) %>% 
+  # Translating title to French
+  px_title(tribble(~language, ~value,
+                   "en",  "Sex, province and highest attained education in Rwanda Labour Force Survey 2023-2024",
+                   "fr", "Sexe, province et niveau d'éducation le plus élevé atteint dans l'Enquête sur la main-d'œuvre du Rwanda 2023-2024")) %>% 
+  # Print title to see the changes
+  px_title()
 
 
+```
 
+Now we have translated the title directly in R (with help from a chatbot). For the title, it was relatively simple to translate directly in R, but we still have many more fields to translate, for example, our value labels.
+
+```{r}
+
+px("lfs_tab1.px") %>% 
+  px_language("en") %>% 
+  px_languages(c("en", "fr")) %>% 
+  px_values()
+
+```
+
+We can, for instance, change the translation for the variable sex.
+
+```{r}
+
+px("lfs_tab1.px") %>% 
+  px_language("en") %>% 
+  px_languages(c("en", "fr")) %>% 
+  px_values(tribble(~`variable-code`, ~code, ~language, ~values,
+                    "A01", "Female", "fr", "Femme",
+                    "A01", "Male", "fr", "Homme")) %>% 
+  px_values()
+
+```
+
+This just translated the values for sex to French, but we still need to translate all other variables, which would require a lot of coding.
+
+### Translating using Excel (recommended)
+
+Rather than using R to translate our PX-file via code, we can easily export our PX-file to Excel, do the translations in Excel, and then import the translated PX-file to R. This also makes it possible to share the file with non-coders for translation, and even if they are able to code in R, it might still be easier to do the translation in Excel. Alternatively, the PX-file can be imported to [PX-edit](https://stat.fi/tup/tilastotietokannat/px-tuoteperhe_en.html) and translated there.
+
+For exporting to Excel, we use `px_save()`, and since the data cannot be translated — only the metadata (value labels, names, etc.) — we set the argument `save_data = FALSE`. This might be particularly helpful if we have a large PX-file with lots of data. For the file in this example, it does not make a big difference whether or not to include the data.
+
+```{r}
+#| eval: false
+
+px("lfs_tab1.px") %>% 
+  px_language("en") %>% 
+  px_languages(c("en", "fr")) %>% 
+  px_save("lfs_tab1_translate.xlsx", save_data = FALSE)
+
+```
+
+The code saves an Excel document and we can now do our translations in the different sheets. The sheet for "Cells" is shown below, where we can translate the value labels of our variables into French in the column "fr_code-label".
+
+![](pictures/excel_non_translated.png)
+
+When we have finished translating, the translation can be imported back into R using the `px()` function.
+
+```{r}
+#| results: false
+
+px("lfs_tab1_translate.xlsx")
+
+```
+
+As we saved it without data, we have to set the data for our px-object in R using the `px_data()` function.
+
+```{r}
+#| results: false
+
+# import translated excel
+px("lfs_tab1_translate.xlsx") %>% 
+  # attach the data from our initial PX-file
+  px_data(px_data(px("lfs_tab1.px")))
+
+
+```
+
+We use `px_data` twice. First to retrieve the data from our PX-file `lfs_tab1.px` and then to attach that data to the imported translated Excel document. If we don't have any further changes to the file, we can then save the translated PX-file and upload it to PX-web.
+
+```{r}
+
+px("lfs_tab1_translate.xlsx") %>% 
+  # attach the data from our initial PX-file
+  px_data(px_data(px("lfs_tab1.px"))) %>% 
+  # export the PX-file
+  px_save("lfs_tab1_translate.px")
+
+
+```
+
+Now we are ready to get our PX-file with two languages (English and French) to PX-web, and the user can change between the two. Note that this approach of having multiple languages in one PX-file is highly recommended instead of having one file for each language. The latter is error-prone if the data gets updated, as you have to keep track of updating all the files, which is bound to go wrong at some point.
