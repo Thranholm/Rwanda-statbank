@@ -5,25 +5,25 @@ editor_options:
   chunk_output_type: console
 ---
 
-# PX-Files and the PX-File Format
+## PX-Files and the PX-File Format
 
-## What is the PX-file format?
+### What is the PX-file format?
 
 The PX-file format is a specialized data format developed specifically for storing and distributing multidimensional statistical data. Originally created by [Statistics Sweden (SCB)](https://www.scb.se/en/) in the 1990s, the PX format has become the standard format for official statistics across most Nordic countries and is increasingly used by statistical organizations worldwide.
 
-The name "PX" comes from the original Swedish developed software program "PC-AXIS" to display and work with large tabular data. The format was designed to address the unique needs of statistical data distribution, where both data values and comprehensive metadata must be preserved and transmitted together.
+The name "PX" comes from the original Swedish-developed software program "PC-AXIS" to display and work with large tabular data. The format was designed to address the unique needs of statistical data distribution, where both data values and comprehensive metadata must be preserved and transmitted together.
 
-## Use of PX-files for dissemination of official statistics
+### Use of PX-files for dissemination of official statistics
 
-The real power and motivation for PX-files stems from the possibility of disseminating the files through [PX-web](https://www.scb.se/en/services/statistical-programs-for-px-files/px-web/). PX-web can be used to publish statistics in a web based database. Since 1 January 2016 it has been free for government agencies and municipalities, international NSIs and international organisations of statistics to use free of charge.
+The real power and motivation for PX-files stems from the possibility of disseminating the files through [PX-web](https://www.scb.se/en/services/statistical-programs-for-px-files/px-web/). PX-web can be used to publish statistics in a web-based database. Since January 1, 2016, it has been free for government agencies and municipalities, international NSIs, and international organizations of statistics to use free of charge.
 
-When putting the PX-files in PX-web, it is possible to create a Statbank or Statistical Database with any imaginable official statistics, e.g. population, labour market, business or financial statistics. Making the statistics available for the public and policy makers, so people can be informed and ultimately support better and more efficient policy making.
+When putting the PX-files in PX-web, it is possible to create a StatBank or Statistical Database with any imaginable official statistics, e.g., population, labor market, business, or financial statistics. Making the statistics available for the public and policy makers, so people can be informed and ultimately support better and more efficient policy making.
 
-The PX-file and PX-web to create a Statbank are used by different national statistical institutes, e.g. Sweden, Norway, Finland, Iceland, Faroe Islands, Greenland, Latvia, Moldova, Ghana and more. So the use has spread from the Nordic to many other countries. There is any R package [`pxweb`](https://ropengov.github.io/pxweb/index.html) that provides handy functions to work with the PX-web API. It also has a hardcoded list of 30 countries and agencies that use PX-web for diseminating statistics, but their list is not exhaustive.
+The PX-file and PX-web to create a StatBank are used by different national statistical institutes, e.g., Sweden, Norway, Finland, Iceland, Faroe Islands, Greenland, Latvia, Moldova, Ghana, and more. So the use has spread from the Nordic to many other countries. There is an R package [`pxweb`](https://ropengov.github.io/pxweb/index.html) that provides handy functions to work with the PX-web API. It also has a hardcoded list of 30 countries and agencies that use PX-web for disseminating statistics, but their list is not exhaustive.
 
 ## PX-files in R
 
-R can be used to create and work with PX-files. Statistics Greenland has developed a great package for working with PX-files in R, called `pxmake`. In it simplest form it can take an existing data frame in R and turn it into an exported PX-file. More information can be found on the [pxmake webpage](https://statisticsgreenland.github.io/pxmake/). In the following documents, `pxmake`'s functions will be used to show how to update existing file, create new files and change multiple files at once.
+R can be used to create and work with PX-files. Statistics Greenland has developed a great package for working with PX-files in R, called `pxmake`. In its simplest form, it can take an existing data frame in R and turn it into an exported PX-file. More information can be found on the [pxmake webpage](https://statisticsgreenland.github.io/pxmake/). In the following documents, `pxmake`'s functions will be used to show how to update existing files, create new files, and change multiple files at once.
 
 The following code showcases a basic example for generating a PX-file:
 
@@ -87,7 +87,6 @@ px_df <- px_title(px_df, "Test PX-file")
 
 ```
 
-With the power of the `magrittr` pipe we can add many more metadata functions together. The following guides will exemplify this. A list of all supported keywords (and not supported keywords) can be found [here](https://statisticsgreenland.github.io/pxmake/).
+With the power of the `magrittr` pipe, we can add many more metadata functions together. The following guides will exemplify this. A list of all supported keywords (and not supported keywords) can be found [here](https://statisticsgreenland.github.io/pxmake/).
 
-Read the introduction from the `pxmake` package on who to create your [first PX-file](https://statisticsgreenland.github.io/pxmake/articles/first-px-file.html), which has a more extented example of making a proper PX-file.
-
+Read the introduction from the `pxmake` package on how to create your [first PX-file](https://statisticsgreenland.github.io/pxmake/articles/first-px-file.html), which has a more extended example of making a proper PX-file.

@@ -9,13 +9,13 @@ editor_options:
 
 The PX-file format has a specific keyword to deal with time series data. It is not so different from any other variable, but it helps the plotting feature in PX-web to identify that the table contains a time variable and make a meaningful plot for the user.
 
-The TIMEVAL keyword can handle have a format of yearly, half-yearly, quarterly, monthly or weekly.
+The TIMEVAL keyword can have a format of yearly, half-yearly, quarterly, monthly or weekly.
 
 It follows the following formats:
 
 - Annual: 2024, 2025
 - Half-yearly: 2025H1, 2025H2
-- Quaterly: 2025Q1, 2025Q2, 2025Q3, 2025Q4
+- Quarterly: 2025Q1, 2025Q2, 2025Q3, 2025Q4
 - Monthly: 2025M01, 2025M02, 2025M03, 2025M04
 - Weekly: 2025W01, 2025W02, 2025W03, 2025W04
 
@@ -32,7 +32,7 @@ px("data/Employment_example_tab1.px") %>%
 
 ```
 
-This can be done with just a few lines of code. However, the code below is quite compact and has a lot going on. It imports the PX-file we want to change, retrieve the data, joining together year and quarter to one variable called `Time`. Afterwards, the data in the PX-file is changed to our new modified dataset. We set the TIMEVAL keyword to `Time` and save the new PX-file.
+This can be done with just a few lines of code, though the code below is quite compact and has a lot going on. It imports the PX-file we want to change, retrieve the data, joining together year and quarter to one variable called `Time`. Afterwards, the data in the PX-file is changed to our new modified dataset. We set the TIMEVAL keyword to `Time` and save the new PX-file.
 
 ```{r}
 
@@ -47,9 +47,9 @@ px("data/Employment_example_tab1.px") %>%
 
 ```
 
-The former PX-file's metadata also had metadata for the variable `Quarter`, which we now has removed from the data. Luckily the metadata is also updated when modifying the data, so the metadata for `Quarter` is removed, but all other metadata, like title, content, source etc. are preserved from the initial PX-file.
+The former PX-file's metadata also had metadata for the variable `Quarter`, which we have now removed from the data. Luckily the metadata is also updated when modifying the data, so the metadata for `Quarter` is removed, but all other metadata, like title, content, source etc. are preserved from the initial PX-file.
 
-The code below gives same result, but with an intermediate step, which gives beter readability.
+The code below gives the same result, but with an intermediate step, which gives better readability.
 
 ```{r}
 #| code-fold: true
@@ -69,4 +69,3 @@ px("data/Employment_example_tab1.px") %>%
 
 
 ```
-

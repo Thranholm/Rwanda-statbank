@@ -7,7 +7,7 @@ editor_options:
 
 ## Small PX-file from scratch
 
-This guide walks through how take microdata and create a PX-file. There might be some considerations in this process depending on the types of variables you have in your data. Microdata is understood in the way that each row is an observation, so for population statistics each row will be a person.
+This guide walks through how to take microdata and create a PX-file. There might be some considerations in this process depending on the types of variables you have in your data. Microdata is understood in the way that each row is an observation, so for population statistics each row will be a person.
 
 ### Inspecting data
 
@@ -22,7 +22,7 @@ head(greenlanders)
 
 ### Modifying and saving the file
 
-We also want to use some data manipulation functions so we read in the `tidyverse`, where especially the pipe operator also comes in handy.
+We also want to use some data manipulation functions so we load the `tidyverse` package, where the pipe operator especially comes in handy.
 
 First we calculate a frequency variable for the data
 
@@ -72,13 +72,15 @@ gl_freq %>%
 
 ```
 
+This showed how to use a dataset already in R, the next chapter [Updating PX-files](px_update_files.qmd) shows how to import from Stata and convert it to a PX-file. It is the same procedure as shown above, just with a different data source.
+
 ## Hierarchies in PX-files
 
-Now we can make a simple PX-file from microdata. However, sometimes we might have a variable with a hierarchical structure. In this case the variable age will be the example, as it can be grouped in multiple ways, e.g. 5 years group and 10 years group or other groups.
+Above we made a simple PX-file from microdata. However, sometimes we might have a variable with a hierarchical structure. In this case the variable age will be the example, as it can be grouped in multiple ways, e.g. 5-year groups and 10-year groups or other groups.
 
 ### Selection lists
 
-Currently the age variable is in one year groups. It could make sense to group that into 5 year and 10 year groups. Therefore, we make 5 and 10 year groups in our data using the `age_groups()` function from the `AMR` package.
+Currently the age variable is in one year groups. It could make sense to group these into 5-year and 10-year groups. Therefore, we make 5 and 10 year groups in our data using the `age_groups()` function from the `AMR` package.
 
 ```{r}
 # If not installed
@@ -97,9 +99,9 @@ head(age_classification)
 
 ```
 
-The above code creates a data frame, which can be used as input to the function `px_classification()`. It must have the mandatory column `valuecode` indicating the codes in the data for the given variable. The column `valuetext` is also included here, but is only required if there are texts associated with the codes in the PX-file, e.g. if using data for economic activity ([ISIC](https://unstats.un.org/unsd/classifications/Econ/isic) or similar) then the codes may have texts. Any additional column represents an aggregation and the column name, will be the aggregation name shown in PX-web. In this case we have two aggregations `5 years classes` and `10 years classes`. As the column names are the text shown on PW-web the names have been enclosed in backticks (`) to allow for spacing in the name.
+The code above creates a data frame that can be used as input to the function `px_classification()`. It must have a mandatory column `valuecode` indicating the codes in the data for the given variable. The column `valuetext` is also included here, but is only required if there are texts associated with the codes in the PX-file, e.g. when using data for economic activity ([ISIC](https://unstats.un.org/unsd/classifications/Econ/isic) or similar) then the codes may have texts. Any additional column represents an aggregation and the column name, will be the aggregation name shown in PX-web. In this case we have two aggregations `5 years classes` and `10 years classes`. As the column names are the text shown on PX-web the names have been enclosed in backticks (`) to allow for spacing in the name.
 
-Now we use `px_classification` to create the selection lists in R and afterwards we use `px_save_classification()` to export the relevant files. It creates a ".vs" file and one or more ".agg" files. In very simple terms the ".vs" file tells PX-web which selection/aggregation lists to use, while the ".agg" files are the actual aggregations, e.g. five year classes and ten year classes in this case. More information can be found in the documentation for the [PX-file format](https://www.scb.se/en/services/statistical-programs-for-px-files/px-file-format/).
+Now we use `px_classification` to create the selection lists in R. Afterwards, we use `px_save_classification()` to export the relevant files. It creates a ".vs" file and one or more ".agg" files. In very simple terms the ".vs" file tells PX-web which selection/aggregation lists to use, while the ".agg" files are the actual aggregations, e.g. five year classes and ten year classes in this case. More information can be found in the documentation for the [PX-file format](https://www.scb.se/en/services/statistical-programs-for-px-files/px-file-format/).
 
 ```{r}
 
@@ -110,7 +112,7 @@ age_class <- px_classification(name = "age_select", prestext = "Age classificati
 px_save_classification(age_class, getwd())
 ```
 
-The `name` argument will be the name of the ".vs" file, in this case it saves the file as "age_select.vs". `df` is the data frame with the classification/selection list just created. The `domain` is the name that we need to put in our PX-file to indicate that the PX-file should use the particular selection list. So the code below read the PX-file to R and set the domain for `age` as `age_class` (so for the variable `age`should the selection lists with the domain `age_class` be used).
+The `name` argument will be the name of the ".vs" file, in this case it saves the file as "age_select.vs". `df` is the data frame with the classification/selection list just created. The `domain` is the name that we need to put in our PX-file to indicate that the PX-file should use the particular selection list. So the code below reads the PX-file to R and sets the domain for `age` as `age_class` (so for the variable `age` the selection lists with the domain `age_class` should be used).
 
 ```{r}
 
@@ -122,7 +124,7 @@ px("px_greenland_testfile.px") %>%
 
 ```
 
-Afterwards the modified PX-file is saved again and is now ready to be loaded to PX-web and saved in the same folder as the ".vs" and ".agg" files.
+Afterwards, the modified PX-file is saved again and is now ready to be loaded to PX-web and saved in the same folder as the ".vs" and ".agg" files.
 
 ### Tree like hierarchy
 

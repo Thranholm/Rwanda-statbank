@@ -6,11 +6,11 @@ editor_options:
 
 ## Size matters
 
-PX-files can contain a lot of data, which is great. However this also means that some way along the process it had required handling of this large data. The chapter [Importing data](import_data.qmd) gives some tips about handling large datasets via functions in the `haven` package with `n_max` and `col_select`. The same arguments are also available for csv-files e.g. in the function `readr::read_csv()`.
+PX-files can contain a lot of data, which is great. However this also means that somewhere along the process it will require handling of this large data. The chapter [Importing data](import_data.qmd) gives some tips about handling large datasets via functions in the `haven` package with `n_max` and `col_select`. The same arguments are also available for csv-files e.g. in the function `readr::read_csv()`.
 
 ### Parquet files and rds-files
 
-An efficient file format in terms of file size is the parquet format. To examplify this we retrieve a large PX-table from [Statistics Sweden's Statistical Database](https://www.statistikdatabasen.scb.se/pxweb/en/ssd/START__LE__LE0105__LE0105C/LE0105Demogr02/). We have found a large demography table and imported that through the functions in the `pxweb` package, which helps dealing with PX-web API. Afterwards, we use `pxmake`'s `px()` function to get it as a PX-object in R.
+An efficient file format in terms of file size is the parquet format. To exemplify this we retrieve a large PX-table from [Statistics Sweden's Statistical Database](https://www.statistikdatabasen.scb.se/pxweb/en/ssd/START__LE__LE0105__LE0105C/LE0105Demogr02/). We have found a large demography table and imported that through the functions in the `pxweb` package, which helps dealing with PX-web API. Afterwards, we use `pxmake`'s `px()` function to get it as a PX-object in R.
 
 
 ```{r}
@@ -148,7 +148,7 @@ px_from_api <- map(file_api2$value, px) %>%
 
 ```
 
-Let's just have a view of the data. 
+Let's just view the data. 
 
 ```{r}
 
@@ -157,9 +157,9 @@ px_from_api %>%
 
 ```
 
-The dataset has `r nrow(px_from_api %>% px_data())` rows and 7 explanatory variable and one frequency variable.
+The dataset has `r nrow(px_from_api %>% px_data())` rows and 7 explanatory variables and one frequency variable.
 
-The `px_save()` also allow for saving data in Excel, rds or parquet. This can be useful in different situations. The Excel-format is not very efficient for storing large datasets in terms of file size, so it will not be the focus for this section. However, it can be useful for other cases, se for example the chapter about [Multiple languages in PX-files](px_multi_lingual.px).
+The `px_save()` function also allows for saving data in Excel, rds or parquet. This can be useful in different situations. The Excel-format is not very efficient for storing large datasets in terms of file size, so it will not be the focus for this section. However, it can be useful for other cases, see for example the chapter about [Multiple languages in PX-files](px_multi_lingual.px).
 
 Using the `px_save` function, we can easily save the data as both rds and parquet format using the `data_path` argument.
 
@@ -178,19 +178,19 @@ Note that when using the `data_path` argument to save to parquet or rds, we also
 
 The rds-format is R's data format and works fairly quick with R to read and write files. However the alternative, parquet files might sometimes be even better in terms of speed (read/write) and size.
 
-In the case above, the dataset, even though it has many rows, is not necessarily a large dataset. Sometime a dataset could have millions of rows if it for example covers population data for a country.
+In the case above, the dataset, even though it has many rows, is not necessarily a large dataset. Sometimes a dataset could have millions of rows if it for example covers population data for a country.
 
 ## Splitting data and efficient packages
 
 When working with datasets containing millions or tens of millions of observations, traditional R approaches can quickly become memory-intensive and computationally slow. 
 
-Here we can instead use two strategies, splitting the dataset into smaller chunks and use packages with the specific focus of working with large datasets in R. To chunks could for instance be each year or a similar division of the data, where you can run your code in meaningful chunks.
+Here we can instead use two strategies: splitting the dataset into smaller chunks and using packages with the specific focus of working with large datasets in R. These chunks could for instance be each year or a similar division of the data, where you can run your code in meaningful chunks.
 
-Furthermore it can be advised to take advantage of R packages with a specific focus on working with large data. Some of the most common packages are `data.table`, `dplyr` with `dtplyr`, `arrow`, and `vroom`.
+Furthermore, it can be advised to take advantage of R packages with a specific focus on working with large data. Some of the most common packages are `data.table`, `dplyr` with `dtplyr`, `arrow`, and `vroom`.
 
-Sometimes we might have a large external file, like a big Stata dataset, which can be time consuming for R to read. Then we can use the arguments `skip` and `n_max` to read in the data in chunks, combine it and then write to an rds-file so it is easier to read that data to R in the future.
+Sometimes we might have a large external file, like a big Stata dataset, which can be time-consuming for R to read. Then we can use the arguments `skip` and `n_max` to read in the data in chunks, combine it and then write to an rds-file so it is easier to read that data to R in the future.
 
-The code below does just that, it take a large stata-file, read it in chunks of 100000 observations (can be adjusted) and saves a combined rds-file.
+The code below does just that: it takes a large Stata file, reads it in chunks of 100000 observations (can be adjusted) and saves a combined rds-file.
 
 ```{r}
 #| eval: false
@@ -219,4 +219,3 @@ repeat {
 combined_data <- rbindlist(chunks)
 saveRDS(combined_data, "data_test.rds")
 ```
-
