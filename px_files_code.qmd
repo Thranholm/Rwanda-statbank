@@ -1,17 +1,86 @@
 ---
 title: "Codes in PX-files"
 format: html
+editor_options: 
+  chunk_output_type: console
 ---
 
+## Code or text
 
+When working with PX-files, it is recommended to use codes if possible and then use code labels for a representation of that code. For a simple variable "sex," this could be 1 = Male and 2 = Female. So 1 and 2 are the codes, and "Male" and "Female" are the code labels. However, this also requires some sort of management of the codes and code labels. This will help ensure consistent codes and labels throughout the PX-web database and also make changes easier.
+
+Instead of having to make sure to update each file with a change to a label, it can be done in a master file of codes and labels, and then the files can be rerun. Of course, this assumes that each file uses the codes and labels from the master file.
+
+### Data formats with codes
+
+Some data formats actually have these code-text pairs in them. This is often the case for the Stata (.dta) and SPSS (.sav) formats, and sometimes the SAS format (.sas7bdat).
 
 ```{r}
+#| message: false
 library(haven)
 library(tidyverse)
 
-read_dta("data/RW_LFS2024.dta") %>% 
-  sjlabelled::get_labels(values = "p")
+read_dta("data/RW_LFS2024.dta", n_max = 5) %>% 
+  select(province, Code_UR, code_dis, A01)
 
 ```
 
+We have just selected a few variables and can see that the Stata dataset for the 2024 Rwandan Labour Force Survey indeed has codes associated with text. We can use the package `sjlabelled` to extract the codes from the Stata dataset.
 
+```{r}
+
+labels_codes <- read_dta("data/RW_LFS2024.dta", n_max = 5) %>% 
+  ## We use the namespace as sjlabelled has conflicting
+  ## functions with other packages
+  sjlabelled::get_labels(values = "as.prefix")
+
+labels_codes[5:7]
+
+```
+
+Using the `get_labels` function from `sjlabelled` with the argument `values = "as.name"`, we get all the labels with a value/code as a variable name. It is saved as a list object in R. A few variables with their labels and codes are shown in the output above.
+
+With some manipulation of the list, we get a tibble with the following variables: `variable-code`, `code`, and `values`. There is a lot going on in the code below. For better understanding of the `map` function, see the documentation for the package [`purrr`](). It also uses some regular expressions in functions from the [`stringr`]() package.
+
+```{r}
+
+label_codes_df <- labels_codes %>%
+  map(as_tibble) %>% 
+  ## Removes empty tibbles or with only 1 option
+  keep(~nrow(.x) > 1) %>% 
+  map(~mutate(.x,
+              code = str_extract(.x$value, "\\d+"),
+              values = str_remove(.x$value, "\\[\\d+]\\s+"))) %>% 
+  map(~select(.x, -value)) %>% 
+  as_tibble_col() %>% 
+  mutate(`variable-code` = names(value)) %>%
+  unnest(value) %>% 
+  select(`variable-code`, code, values)
+
+head(label_codes_df)
+
+```
+
+Now we have a data frame with variable names, codes, and labels, which we can use in the PX-files. This could also be exported as Excel format and maintained. The data frame can also be used in the function `px_values` now, if the dataset contains codes and not texts.
+
+We can also save these code and label pairs in PX-files and use them when generating our PX-files. We read in our data again, convert it to PX-format, and add the labels in `px_values`. When converting to PX-format, it assumes that the last column is a frequency column. This is not the case here, which is why we set all variables as stub in `px_stub()`. Then we use `px_micro()` to save multiple PX-files, one for each of our variables in this case, in the output folder "code-labels". Now it is possible for us to maintain the metadata for each of our variables using the PX-files.
+
+```{r}
+library(pxmake)
+
+rw_lfs <- read_dta("data/RW_LFS2024.dta")
+
+rw_lfs %>% 
+  select(any_of(unique(label_codes_df$`variable-code`))) %>% 
+  px() %>% 
+  px_values(label_codes_df) %>% 
+  px_stub(names(rw_lfs)) %>% 
+  px_micro("code-labels")
+
+```
+
+This code might take some time to run if the dataset has many variables (as is the case with the Rwandan Labour Force Survey).
+
+### Alternative methods
+
+This was a data-driven approach on how to retrieve the codes and labels from the data. In a more metadata-driven approach, we could have an external database with variable names, codes, and values, which could be connected to either via a database connection or an API. This approach could prove to be more stable. However, it requires maintenance to ensure that the values in the data also reflect the metadata values in the database.
