@@ -7,9 +7,9 @@ editor_options:
 
 ## Using `pxmake` to update existing PX-files
 
-The `pxmake` package can also be used to update existing PX-files. This could be adding data for a new year or updating all data because of an mistake in the earlier file. It is not needed to create a whole new PX-file from scratch, but we can use the good work from the existing PX-file.
+The `pxmake` package can also be used to update existing PX-files. This could be adding data for a new year or updating all data because of a mistake in the earlier file. It is not needed to create a whole new PX-file from scratch, but we can use the good work from the existing PX-file.
 
-We will work with the Rwandan Labour Force Survey where the dataset can be accessed from [The National Institute of Statistics of Rwanda](https://microdata.statistics.gov.rw/index.php/catalog)'s webpage. A PX-file with sex, province and highest attained education has been made for 2023 and now we want to update it with data for 2024. The code for the created PX-file for 2023 can be unfolded below. The topics about time and order used in the code are covered in higher detail the chapters [Working with time in PX-files](px_files_time.qmd) and [Codes in PX-files](px_files_code.qmd).
+We will work with the Rwandan Labour Force Survey where the dataset can be accessed from [The National Institute of Statistics of Rwanda](https://microdata.statistics.gov.rw/index.php/catalog)'s webpage. A PX-file with sex, province and highest attained education has been made for 2023 and now we want to update it with data for 2024. The code for the created PX-file for 2023 can be unfolded below. The topics about time and order used in the code are covered in higher detail in the chapters [Working with time in PX-files](px_files_time.qmd) and [Codes in PX-files](px_files_code.qmd).
 
 ```{r}
 #| code-fold: true
@@ -20,34 +20,34 @@ library(haven)
 library(tidyverse)
 library(pxmake)
 
-## Imports data from stata format
+## Import data from stata format
 RW_lfs2023 <- read_dta("data/RW_LFS2023.dta") %>% 
   sjlabelled::as_label()
 
-# Selecting relevant variables
+# Select relevant variables
 RW_lfs2023_tab1 <- RW_lfs2023 %>% 
   # Select year, sex, province and education
   select(LFS_year, A01, province, B02A) %>% 
-  # Removes blank education
+  # Remove blank education
   filter(!is.na(B02A)) %>% 
   count(across(everything()), name = "freq")
 
 px_lfs_tab1 <- RW_lfs2023_tab1 %>% 
   px() %>% 
-  # Setting title
+  # Set title
   px_title("Sex, province and highest attained education in Rwanda Labour Force Survey 2023") %>%
   # Set a matrix-name
   px_matrix("tab1_lfs") %>% 
-  # changing variable labels
+  # Change variable labels
   px_variable_label(tribble(~`variable-code`, ~`variable-label`,
                             "LFS_year", "Year",
                             "A01", "Sex",
                             "province", "Province",
                             "B02A", "Education")) %>% 
   px_add_totals(c("A01", "province", "B02A")) %>% 
-  # setting time variable
+  # Set time variable
   px_timeval("LFS_year") %>% 
-  # Getting Total values first
+  # Get Total values first
   px_order(tribble(~`variable-code`, ~code, ~order,
                    "A01", "Total", 0,
                    "province", "Total", 0,
@@ -60,7 +60,7 @@ px_save(px_lfs_tab1, "lfs_tab1.px")
 
 ### Updating data with a new year
 
-We have our existing PX-file for the 2023 Rwanda Labour Force Survey and maybe also including earlier years and it has been published to PX-web. Now we want to update so we also can show data for 2024 on PX-web. So first we read in our data for 2024 and select the relevant variables.
+We have our existing PX-file for the 2023 Rwanda Labour Force Survey and maybe also including earlier years and it has been published to PX-web. Now we want to update so we can also show data for 2024 on PX-web. So first we read in our data for 2024 and select the relevant variables.
 
 
 ```{r}
@@ -69,15 +69,15 @@ RW_lfs2024 <- read_dta("data/RW_LFS2024.dta") %>%
   sjlabelled::as_label()
 
 RW_lfs2024_tab1 <- RW_lfs2024 %>% 
-  # select year, sex, province and education
+  # Select year, sex, province and education
   select(LFS_year, A01, province, B02A) %>% 
-  # Removes blank education
+  # Remove blank education
   filter(!is.na(B02A)) %>% 
   count(across(everything()), name = "freq")
 
 ```
 
-Now we have to read in our existing PX-file, which the `px()` function from `pxmake` also can be used for.
+Now we have to read in our existing PX-file, which the `px()` function from `pxmake` can also be used for.
 
 ```{r}
 
@@ -86,11 +86,11 @@ pxweb_lfs_tab1 <- px("lfs_tab1.px")
 ```
 
 
-To update the data we can use the function `px_data()` that can both retrieve and modify data in a PX-object in R. We also need to need to convert the data for 2024 to a PX-object and add totals. So we need to go through a process of:
+To update the data, we can use the function `px_data()` that can both retrieve and modify data in a PX-object in R. We also need to convert the data for 2024 to a PX-object and add totals. So we need to go through a process of:
 
 - Retrieve data from existing PX-file
 - Create data for the new year with added totals
-- Bind to two datasets together
+- Bind the two datasets together
 - Update the data in the existing PX-object
 
 
@@ -98,25 +98,25 @@ To update the data we can use the function `px_data()` that can both retrieve an
 # Retrieve data from existing px-file
 px_lfs_data_existing <- px_data(pxweb_lfs_tab1)
 
-# creating data for the 2024 data
-# Converting to px-object
+# Create data for the 2024 data
+# Convert to px-object
 px_new_year_data <- px(RW_lfs2024_tab1) %>% 
-  # Adding totals
+  # Add totals
   px_add_totals(c("A01", "province", "B02A")) %>% 
   # Retrieve data for 2024
   px_data()
 
-# Binding the two together
+# Bind the two together
 updated_data <- bind_rows(px_lfs_data_existing, px_new_year_data)
 
-# Adding the data to our px-object
+# Add the data to our px-object
 # Note that data in pxweb_lfs_tab1 is not updated, as we save it to another object
 pxweb_lfs_tab1_update <- pxweb_lfs_tab1 %>% 
   px_data(updated_data)
 
 ```
 
-The code above involved a bit of typing and saving to intermediate objects. The `pxmake` package integrates very well with the pipe-operator as shown in the chapter [PX-file from scratch](px_from_scratch.qmd). The code below achieves same result, but more compressed. However, the code might be harder to read.
+The code above involved a bit of typing and saving to intermediate objects. The `pxmake` package integrates very well with the pipe operator as shown in the chapter [PX-file from scratch](px_from_scratch.qmd). The code below achieves the same result, but more compressed. However, the code might be harder to read.
 
 
 ```{r}
@@ -124,13 +124,13 @@ The code above involved a bit of typing and saving to intermediate objects. The 
 ## Update data in one go
 
 pxweb_lfs_tab1_update2 <- pxweb_lfs_tab1 %>% 
-  # PX_data for updating data in existing object
+  # px_data for updating data in existing object
   px_data(
     # Bind datasets together
     bind_rows(
       # Retrieve existing data
       px_data(pxweb_lfs_tab1),
-      # Creating data for the new year
+      # Create data for the new year
       px(RW_lfs2024_tab1) %>%
         px_add_totals(c("A01", "province", "B02A")) %>% 
         px_data())
@@ -141,7 +141,7 @@ identical(pxweb_lfs_tab1_update, pxweb_lfs_tab1_update2)
 
 ```
 
-Again, the PX-object with the updated is saved to a new object in R for the sake of clarity in this document, but it could also be overwritten by assigning to `pxweb_lfs_tab1` instead of `pxweb_lfs_tab1`.
+Again, the PX-object with the updated data is saved to a new object in R for the sake of clarity in this document, but it could also be overwritten by assigning to `pxweb_lfs_tab1` instead of `pxweb_lfs_tab1_update`.
 
 Now we just save our updated object and it is ready to be uploaded to PX-web. In principle, this could also be added in the code above with a pipe. Note that we in this case overwrite the existing PX-file saved on disk. In production cases, it might be worth considering versioning of the files.
 
@@ -151,13 +151,13 @@ px_save(pxweb_lfs_tab1_update2, "lfs_tab1.px")
 
 ```
 
-It is worth noting that updating the data in this case was swift and easy due to the input data from the Rwandan Labour Force Survey had same structure, variable names and labels in 2023 and 2024. If it used other variable names or labels, we would need extra steps to adjust for that. 
+It is worth noting that updating the data in this case was swift and easy because the input data from the Rwandan Labour Force Survey had the same structure, variable names and labels in 2023 and 2024. If it used other variable names or labels, we would need extra steps to adjust for that. 
 
 ### Updating metadata
 
 Above we just updated the data taking advantage of all the metadata already in place. So for instance, we did not need to specify that the variable name `A01` in PX-web should be shown as "Sex", because the metadata was already in place from the file with just 2023 data.
 
-There might also be cases, where you want to edit the metadata of an existing PX-file. The PX-file just created above has a title, where the year 2023 is included ("Sex, province and highest attained education in Rwanda Labour Force Survey 2023"). The title is now inaccurate as we just added 2024 data to the file. So we want to update the title metadata of our PX-file.
+There might also be cases where you want to edit the metadata of an existing PX-file. The PX-file just created above has a title where the year 2023 is included ("Sex, province and highest attained education in Rwanda Labour Force Survey 2023"). The title is now inaccurate as we just added 2024 data to the file. So we want to update the title metadata of our PX-file.
 
 In a simple case we just remove the year 2023 from the title. This can be done very easily with the code below.
 
@@ -169,9 +169,9 @@ px("lfs_tab1.px") %>%
 
 ```
 
-We just read in the PX-file, changes the title through `px_title()` and saves it via `px_save()`.
+We just read in the PX-file, change the title through `px_title()` and save it via `px_save()`.
 
-Sometimes we may want to include the years that the data covers in the title of the table, so the user don't have to open the table to see which time periods are covered. This could be achieved by simply editing the function above to: `px_title("Sex, province and highest attained education in Rwanda Labour Force Survey 2023-2024")`. 
+Sometimes we may want to include the years that the data cover in the title of the table, so the user doesn't have to open the table to see which time periods are covered. This could be achieved by simply editing the function above to: `px_title("Sex, province and highest attained education in Rwanda Labour Force Survey 2023-2024")`. 
 
 However, this would require you to always remember to update the title when updating with a new year. Instead we could retrieve `min()` and `max()` year from the data and use `paste0()` to put the title together.
 
@@ -190,49 +190,46 @@ px("lfs_tab1.px") %>%
   
 ```
 
-The code get the variable `LFS_year` from the data and assign only the distinct values to the object `years`. Afterwards we read in the PX-file, paste together a title with minimum and maximum year and add it to `px_title()` and then saves the PX-file again. It is a little more code-heavy, but ensures an automatic update of the title.
+The code gets the variable `LFS_year` from the data and assigns only the distinct values to the object `years`. Afterwards, we read in the PX-file, paste together a title with minimum and maximum year and add it to `px_title()` and then save the PX-file again. It is a little more code-heavy, but ensures an automatic update of the title.
 
 ### Updating same metadata in multiple files
 
-Some times it might be the case that we have multiple PX-files where we want to modify the same piece of metadata. The code that can be unfolded creates a second table from the Rwandan Labour Force Survey, where it uses type of locality (urban/rural), instead of province.
+Sometimes it might be the case that we have multiple PX-files where we want to modify the same piece of metadata. The code that can be unfolded creates a second table from the Rwandan Labour Force Survey, where it uses type of locality (urban/rural) instead of province.
 
 ```{r}
 #| code-fold: true
 #| code-summary: Create second LFS PX-file
 
 RW_lfs2024_tab2 <- RW_lfs2024 %>% 
-  # select year, sex, province and education
+  # Select year, sex, province and education
   select(LFS_year, A01, Code_UR, B02A) %>% 
-  # Removes blank education
+  # Remove blank education
   filter(!is.na(B02A)) %>% 
   count(across(everything()), name = "freq")
 
 RW_lfs2024_tab2 %>% 
   px() %>% 
-  # Setting title
+  # Set title
   px_title("Sex, type of locality and highest attained education in Rwanda Labour Force Survey") %>%
   # Set a matrix-name
   px_matrix("tab2_lfs") %>% 
-  # changing variable labels
+  # Change variable labels
   px_variable_label(tribble(~`variable-code`, ~`variable-label`,
                             "LFS_year", "Year",
                             "A01", "Sex",
                             "Code_UR", "Type of locality",
                             "B02A", "Education")) %>% 
   px_add_totals(c("A01", "Code_UR", "B02A")) %>% 
-  # setting time variable
+  # Set time variable
   px_timeval("LFS_year") %>% 
-  # Getting Total values first
+  # Get Total values first
   px_order(tribble(~`variable-code`, ~code, ~order,
-                   "A01", "Total", 0,
-                   "Code_UR", "Total", 0,
-                   "B02A", "Total", 0)) %>% 
+                   "A01", "Total", 0)) %>% 
   px_save("lfs_tab2.px")
-
-
+                   
 ```
 
-However, for both tables the metadata for "unit" just shows the default value "units". In fact it should instead show "Persons", but we just forgot to put it in, when creating the initial PX-files. Instead of changing both files manually, we simply just loop over them.
+However, for both tables the metadata for "unit" just shows the default value "units". In fact it should instead show "Persons", but we just forgot to put it in when creating the initial PX-files. Instead of changing both files manually, we simply loop over them.
 
 ```{r}
 
@@ -240,17 +237,17 @@ However, for both tables the metadata for "unit" just shows the default value "u
 for (x in c("lfs_tab1.px", "lfs_tab2.px")){
   
   px(x) %>% # Read file
-    px_units("Persons") %>% # change units
-    px_save(x) # saves to disk
+    px_units("Persons") %>% # Change units
+    px_save(x) # Save to disk
   
 }
 
 
 ```
 
-The value for `x` is in the loop replaced by the filename of the PX-file. It reads the file, changes the unit keyword and overwrite the existing PX-file (by using `px_save(x)`). If you don't want to overwrite right away, maybe because you are unsure of your changes, something like `px_save(paste("ver2", x, sep = "_")).
+The value for `x` is in the loop replaced by the filename of the PX-file. It reads the file, changes the unit keyword and overwrites the existing PX-file (by using `px_save(x)`). If you don't want to overwrite right away, maybe because you are unsure of your changes, something like `px_save(paste("ver2", x, sep = "_"))`.
 
-We are also not just limited to change one metadata, maybe we also want to include a creation date, we just expand our loop. Note that the date must be provided as a character object in `pxmake`, hence the use of `as.character()`
+We are also not limited to changing one metadata field. Maybe we also want to include a creation date. We just expand our loop. Note that the date must be provided as a character object in `pxmake`, hence the use of `as.character()`.
 
 ```{r}
 
@@ -258,17 +255,11 @@ We are also not just limited to change one metadata, maybe we also want to inclu
 for (x in c("lfs_tab1.px", "lfs_tab2.px")){
   
   px(x) %>% # Read file
-    px_units("Persons") %>% # change units
+    px_units("Persons") %>% # Change units
     px_creation_date(as.character(Sys.Date())) %>% # Creation date
-    px_save(x) # saves to disk
+    px_save(x) # Save to disk
   
 }
 
 
 ```
-
-
-
-
-
-
