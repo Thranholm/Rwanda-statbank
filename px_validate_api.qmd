@@ -7,10 +7,11 @@ editor_options:
 
 ## The `pxweb` package
 
-The `pxweb` package has functions to work with the PX-web APIs. It works with any PX-web database, which has the API feature enabled. So below we collect a table from the [Ghanaian StatsBank](https://statsbank.statsghana.gov.gh/pxweb/en/PHC%202021%20StatsBank/).
+The `pxweb` package has functions to work with PX-web APIs. It works with any PX-web database that has the API feature enabled. Below we collect a table from the [Ghanaian StatsBank](https://statsbank.statsghana.gov.gh/pxweb/en/PHC%202021%20StatsBank/).
 
 ```{r}
 #| message: false
+
 library(pxweb)
 library(tidyverse)
 
@@ -24,11 +25,12 @@ from_api <- pxweb_get(url = "https://statsbank.statsghana.gov.gh:443/api/v1/en/P
   as.data.frame() %>% 
   as_tibble() # as_tibble for nicer presentation
 
-head(from_api)
+head(from_api) %>% 
+  kableExtra::kable()
 
 ```
 
-If we want to update this table with data for a new year then we can use data from the API to validate that our data for the new year looks like expected. So now we create some new random data from the dataset for a new year.
+If we want to update this table with data for a new year, we can use data from the API to validate that our data for the new year looks as expected. Now we create some new random data from the dataset for a new year.
 
 ```{r}
 #| code-fold: true
@@ -54,21 +56,22 @@ pct_change <- from_api %>%
 
 ```
 
-Now we can use this new column `pct_change` to see if we have some unexpected high changes (above 10 %), which might indicate some problems in our code generating the data.
+Now we can use this new column `pct_change` to see if we have some unexpectedly high changes (above 10%), which might indicate problems in our code generating the data.
 
 ```{r}
 
 if(max(abs(pct_change$pct_change), na.rm = TRUE) > 10){
-    warning("There are changes above 10 % for the new year. It may indicate problems with the data")
+    warning("There are changes above 10% for the new year. This may indicate problems with the data")
   print(pct_change %>% 
-          filter(abs(pct_change) > 10))
+          filter(abs(pct_change) > 10)) %>% 
+    kableExtra::kable()
 } else {
-  cat("No changes above 10 %")
+  cat("No changes above 10%")
 }
 
 ```
 
-We see that we have some extremely high changes. For example the value for the total across the variables has gone from 11,289,655 to 569. This clearly indicates a mistake. In this case the mistake stems from our random data generation. We can instead do it in a little more controlled proces.
+We see that we have some extremely high changes. For example, the value for the total across the variables has gone from 11,289,655 to 569. This clearly indicates a mistake. In this case, the mistake stems from our random data generation. We can instead do it in a more controlled process.
 
 ```{r}
 #| code-fold: true
@@ -94,26 +97,26 @@ pct_change <- from_api %>%
 if(max(abs(pct_change$pct_change), na.rm = TRUE) > 10){
   print(pct_change %>% 
           filter(abs(pct_change) > 10))
-  stop("There are changes above 10 % for the new year. It may indicate problems with the data")
+  stop("There are changes above 10% for the new year. This may indicate problems with the data")
 } else {
-  cat("No changes above 10 %")
+  cat("No changes above 10%")
 }
 
 ```
 
-Now we have none year-to-year changes above 10 % (of course because our data generation process set a limit on 10 %). This limit of 10 % is not set in stone and should be adjusted according to the content of the data. For example some countries have seen inflation rates above 10 %, so in that case the relevant number might be another.
+Now we have no year-to-year changes above 10% (of course, because our data generation process set a limit of 10%). This limit of 10% is not set in stone and should be adjusted according to the content of the data. For example, some countries have seen inflation rates above 10%, so in that case the relevant number might be different.
 
-Here we checked using data from the PX-web API, also to showcase the API. If the PX-file is available on disk, it may be easier just to load that and then do some validation checks.
+Here we checked using data from the PX-web API, also to showcase the API. If the PX-file is available on disk, it may be easier to just load that and then do some validation checks.
 
-The R package `validate` is specially focus on tools and function for validating data. For more information on data validation see [The Data Validation Cookbook](https://cran.r-project.org/web/packages/validate/vignettes/cookbook.html), which introduces the R-package `validate` and in general data validation concepts and implementations in R.
+The R package `validate` is specifically focused on tools and functions for validating data. For more information on data validation, see [The Data Validation Cookbook](https://cran.r-project.org/web/packages/validate/vignettes/cookbook.html), which introduces the R package `validate` and data validation concepts and implementations in R in general.
 
 ## Check cross-sums
 
-Usually in a Statbank/PX-web database we have more tables covering one topic, e.g. multiple tables to cover the theme of population statistics. Often these tables will share some variables (sex and age would be prime examples) and therefore we expect values to be the same across tables.
+Usually in a Statbank/PX-web database, we have multiple tables covering one topic, e.g., multiple tables to cover the theme of population statistics. Often these tables will share some variables (sex and age would be prime examples), and therefore we expect values to be the same across tables.
 
-We have our data collected from the [Ghanaian StatsBank](https://statsbank.statsghana.gov.gh/pxweb/en/PHC%202021%20StatsBank/PHC%202021%20StatsBank__Education%20and%20Literacy/attended_table.px/) about education statistics for persons 15 year and older who attended school in the past.
+We have our data collected from the [Ghanaian StatsBank](https://statsbank.statsghana.gov.gh/pxweb/en/PHC%202021%20StatsBank/PHC%202021%20StatsBank__Education%20and%20Literacy/attended_table.px/) about education statistics for persons 15 years and older who attended school in the past.
 
-We have another table about [Population (3 years and older) by School Attendance Status, District, Region, Type of Locality, Age and Sex](https://statsbank.statsghana.gov.gh/pxweb/en/PHC%202021%20StatsBank/PHC%202021%20StatsBank__Education%20and%20Literacy/sch_attend_stat_table.px/) and here we would expect that it shares some values with our table from earlier if we filter to school attendance status to attended in past and age over 15 years. So now we collect this data using the `pxweb` package.
+We have another table about [Population (3 years and older) by School Attendance Status, District, Region, Type of Locality, Age and Sex](https://statsbank.statsghana.gov.gh/pxweb/en/PHC%202021%20StatsBank/PHC%202021%20StatsBank__Education%20and%20Literacy/sch_attend_stat_table.px/), and here we would expect that it shares some values with our table from earlier if we filter school attendance status to "attended in past" and age to over 15 years. Now we collect this data using the `pxweb` package.
 
 ```{r}
 
@@ -134,11 +137,12 @@ check_table <- pxweb_get(url = "https://statsbank.statsghana.gov.gh:443/api/v1/e
                             Locality)) %>% 
   as_tibble() # as_tibble for nicer presentation
 
-head(check_table)
+head(check_table) %>% 
+  kableExtra::kable()
 
 ```
 
-This table we want to check with uses another age definition, so we just need to sum up all the age groups to have persons over the age of 15.
+This table we want to check uses another age definition, so we just need to sum up all the age groups to have persons over the age of 15.
 
 ```{r}
 check_table_above_15 <- check_table %>% 
@@ -146,7 +150,7 @@ check_table_above_15 <- check_table %>%
             .by = c(Schoolattendancestatus, Geographic_Area, Locality, Sex))
 ```
 
-Now we have the values for persons of the age of 15 and over, which would correspond to the value for all ages in our initial table. So let's select the corresponding variables between the tables and join them together.
+Now we have the values for persons aged 15 and over, which would correspond to the value for all ages in our initial table. Let's select the corresponding variables between the tables and join them together.
 
 ```{r}
 
@@ -169,7 +173,4 @@ Now we have joined the two tables together and calculated a difference variable 
 unique(cross_check$diff)
 ```
 
-Which it is. So the values shared across the two tables are the same, which is good as it indicates a consistent methodology in the two tables. This could also be a way to check a new generated PX-table, if you know that you have a PX-table in your database, which shares some of the values.
-
-
-
+Which it is. The values shared across the two tables are the same, which is good as it indicates a consistent methodology in the two tables. This could also be a way to check a newly generated PX-table if you know that you have a PX-table in your database that shares some of the values.
