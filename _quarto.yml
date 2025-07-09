@@ -6,8 +6,8 @@ execute:
   freeze: auto
 
 book:
-  title: "PX-files and R"
-  author: "Emil Thraholm"
+  title: "PX-files and R (Stats DK visit to NISR)"
+  author: "Emil Thranholm"
   chapters: 
     - index.qmd
     - introduction.qmd
